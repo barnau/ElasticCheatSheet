@@ -1,0 +1,249 @@
+GET _search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+GET _search 
+{
+   "query": {
+    "match": {
+      "post_text": "another"
+    }
+  } 
+}
+
+GET _cat/indices
+
+GET my_blog/_mapping
+
+
+// create mapping only store user_id
+POST /my_blog
+{
+  
+  "mappings": {
+    "post": {
+      "_source": {
+        "enabled": false
+      },
+      "properties": {
+        "user_id": {
+          "type": "integer",
+          "store": true
+        },
+        "post_text": {
+          "type": "string"
+        },
+        "post_date": {
+          "type": "date",
+          "format": "YYY-MM-DD"
+        }
+      }
+    }
+  }
+}
+
+POST my_blog/post/1
+{
+  "post_date": "2014-02-25",
+  "post_text": "This is a real blog post!",
+  "user_id": 2
+}
+
+// search specify return of user_id
+
+GET my_blog/post/1?fields=user_id
+
+DELETE my_blog
+
+// aliasing
+
+POST /eventlog-2014-08-01
+{
+  "mappings": {
+    "event": {
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+
+POST /eventlog-2014-08-02
+{
+  "mappings": {
+    "event": {
+      "properties": {
+        "error": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
+
+POST /eventlog-2014-08-01/event
+{
+  "error": "Something blew up!"
+}
+
+POST /eventlog-2014-08-02/event
+{
+  "error": "Something else blew up!"
+}
+
+GET /eventlog-2014-08-02/event/_search
+
+
+
+POST _aliases
+{
+  "actions": [
+    {
+      "add": {
+        "index": "eventlog-2014-08-02",
+        "alias": "eventlog"
+      }
+    }
+  ]
+}
+
+GET eventlog/_search
+
+POST my_blog
+{
+  "mappings": {
+    "post": {
+      "properties": {
+        "user_id": {
+          "type": "integer"
+        },
+        "post_text": {
+          "type": "string"
+        },
+        "post_date": {
+          "type": "date"
+        },
+        "post_word_count": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
+
+POST my_blog/post
+{
+  "user_id": 2,
+  "post_text": "i really enjoy writing blog posts",
+  "post_date": "2014-09-15",
+  "word_count": "6"
+}
+
+// basic queries
+
+GET my_blog/post/_search?q=post_text:blog
+
+GET my_blog/post/_search
+{
+  "query": {
+    "match": {
+      "post_text": "wonderful" 
+    }
+  }
+}
+
+// MATCH PHRASE
+// Finds exact phrases
+// Good for full text searching
+// More predictable results
+
+GET my_blog/post/_search
+{
+  "query": {
+    "match_phrase": {
+      "post_text": " blog" 
+    }
+  }
+}
+
+
+// Query Filters
+
+GET my_blog/post/_search
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "match": {
+          "post_text": "blog"
+        }
+      },
+      "filter": {
+        "range": {
+          "post_date": {
+            "gt": "2014-09-15"
+          }
+        }
+      }
+    }
+  }
+}
+
+GET my_blog/post/_search
+{
+  "query": {
+    "filtered": {
+      "query": {
+        "match": {
+          "post_text": "blog"
+        }
+      },
+      "filter": {
+        "term": {
+          "user_id": "2"
+        }
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
