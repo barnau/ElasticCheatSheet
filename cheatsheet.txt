@@ -212,6 +212,118 @@ GET my_blog/post/_search
   }
 }
 
+// Highlighting
+
+GET my_blog/post/_search
+{
+  "query": {
+    "match": {
+      "post_text": "post" 
+    }
+  },
+  "highlight": {
+    "fields": {
+      "post_text": {}
+    }
+  }
+}
+
+// Aggregations
+// see http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-aggregations.html
+
+GET my_blog/post/_search
+{
+  "query": {
+    "match": {
+      "post_text": "blog" 
+    }
+  },
+  "aggs": {
+    "all_words": {
+      "terms": {
+        "field": "post_text"
+      }
+    }
+  }
+}
+
+GET my_blog/post/_search
+{
+  "query": {
+    "match": {
+      "post_text": "blog" 
+    }
+  },
+  "aggs": {
+    "all_words": {
+      "avg": {
+        "field": "post_word_count"
+      }
+    }
+  }
+}
+
+// Analysis and Analyzers
+
+
+
+
+// you can pass any analyzer. Defaults are standard, simple and whitespace
+
+// standard: Good general purpose analyzer for multiple languages. Breaks up text strings by natural word boundaries, takes away punctuation, and lower-cases terms
+
+// whitespace: Breaks up text by whitespace only. More useful for strings like computer code or logs
+
+// simple: Breaks up strings by anything that isn't a number'
+
+// try this in postman
+
+// POST to http://localhost:9200/_analyze?analyzer=standard
+
+// BODY enter any text you want analyzed. don't enter {}
+
+DELETE my_blog
+
+POST my_blog
+{
+  "mappings": {
+    "post": {
+      "properties": {
+        "user_id": {
+          "type": "integer"
+        },
+        "post_text": {
+          "type": "string",
+          "analyzer": "whitespace"
+        },
+        "post_date": {
+          "type": "date"
+        },
+        "post_word_count": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}
+
+POST /my_blog/post
+{
+  "user_id": 1,
+  "post_date": "2014-10-20",
+  "post_text": "Convert the tilte-case text using the ToLower(string) command",
+  "post_word_count": 8
+}
+
+GET my_blog/post/_search
+{
+  "query": {
+    "term": {
+      "post_text": "ToLower(string)" 
+    }
+  }
+}
+
 
 
 
