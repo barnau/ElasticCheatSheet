@@ -324,6 +324,12 @@ GET my_blog/post/_search
   }
 }
 
+// To prevent filed from being analyzed add "index": "not_analyzed" or you could make it a keyword field in newer Elastic
+ // "post_text": {
+ //         "type": "string",
+ //         "analyzer": "whitespace"
+ //       },
+
 
 
 
